@@ -9,11 +9,6 @@ public class View {
 
     public void UpdateGameView(GameStateDTO gameState){
 
-
-        // TODO: Här spottas jämförelse mellan content length ut. Hur ska vi göra?
-        //Control: Are the lengths the same?
-        //System.out.println(contentLengthControl(gameInfo));
-
         // CHOOSE TEMPLATES depending on GAME STATE
         if (gameState.state.equals("LETTER_GUESS")){
             String view = createLetterGuessView(gameState);
@@ -48,19 +43,5 @@ public class View {
         sb.append("Score: " + state.gameScore + "  Lives: " + state.livesLeft + "/" + 3 +
                 "   Correct: "+state.numCorrectGuesses + "  Hidden:"+ state.theHiddenWord + "  Guessed: " + state.guessedLetters);
         return sb.toString();
-    }
-
-    private String contentLengthControl(String[] gameInfo) {
-        int lengthHeader = Integer.parseInt(gameInfo[0]);
-        StringBuilder sb = new StringBuilder();
-        for (int i = 1; i < gameInfo.length;i++){
-            sb.append(gameInfo[i] + "-");
-        }
-        sb.deleteCharAt(sb.length()-1);
-        System.out.println(sb.toString());
-        int checkBodyLength = sb.toString().getBytes().length;
-        if (checkBodyLength == lengthHeader) return "SAME: " + checkBodyLength + " & " + lengthHeader;
-        else return "NOT SAME: " + checkBodyLength + " & " + lengthHeader;
-
     }
 }
