@@ -72,6 +72,7 @@ public class ConnectionHandler extends Thread {
         JSONObject obj = (JSONObject) wrapper.get("gameState");
         gameState.state = (String) obj.get("state");
         gameState.gameScore = Integer.parseInt(obj.get("score").toString());
+        gameState.totalLives = Integer.parseInt(obj.get("totalLives").toString());
         gameState.livesLeft = Integer.parseInt(obj.get("livesLeft").toString());
         gameState.numCorrectGuesses = Integer.parseInt(obj.get("numCorrect").toString());
         gameState.guessedLetters = (String)obj.get("prevGuesses");

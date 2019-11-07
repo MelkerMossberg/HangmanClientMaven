@@ -7,19 +7,17 @@ public class View {
         System.out.println("Welcome to HangMan!\nGuess a letter or the full word. Type 'quit' to close the game.\n");
     }
 
-    public void UpdateGameView(GameStateDTO gameState){
+    public void UpdateGameView(GameStateDTO game){
 
         // CHOOSE TEMPLATES depending on GAME STATE
-        if (gameState.state.equals("LETTER_GUESS")){
-            String view = createLetterGuessView(gameState);
+        if (game.state.equals("LETTER_GUESS")){
+            String view = createLetterGuessView(game);
             System.out.println(view);
         }
-        else if (gameState.equals("LOST"))
-            printYouLoose(gameState);
-
-        else if (gameState.equals("WIN"))
-            printYouWin(gameState);
-
+        else if (game.state.equals("LOST"))
+            printYouLoose(game);
+        else if (game.state.equals("WIN"))
+            printYouWin(game);
         else
             System.out.println("Nothing got caught in UpdateGameView");
     }
@@ -40,7 +38,7 @@ public class View {
 
     private String createLetterGuessView(GameStateDTO state) {
         StringBuilder sb = new StringBuilder();
-        sb.append("Score: " + state.gameScore + "  Lives: " + state.livesLeft + "/" + 3 +
+        sb.append("Score: " + state.gameScore + "  Lives: " + state.livesLeft + "/" + state.totalLives +
                 "   Correct: "+state.numCorrectGuesses + "  Hidden:"+ state.theHiddenWord + "  Guessed: " + state.guessedLetters);
         return sb.toString();
     }
