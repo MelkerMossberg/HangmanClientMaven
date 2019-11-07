@@ -1,33 +1,53 @@
 package Hangman.view;
 
+import Hangman.net.GameStateDTO;
+
 public class View {
     public View(){
         System.out.println("Welcome to HangMan!\nGuess a letter or the full word. Type 'quit' to close the game.\n");
     }
 
-    public void UpdateGameView(String info){
-        String[] gameInfo = info.split("-");
+    public void UpdateGameView(GameStateDTO gameState){
+
 
         // TODO: Här spottas jämförelse mellan content length ut. Hur ska vi göra?
         //Control: Are the lengths the same?
         //System.out.println(contentLengthControl(gameInfo));
 
-        // Get GAME STATE
-        String gameState = gameInfo[1];
-
         // CHOOSE TEMPLATES depending on GAME STATE
-        if (gameState.equals("LETTER_GUESS")){
-            String view = createLetterGuessView(gameInfo);
+        if (gameState.state.equals("LETTER_GUESS")){
+            String view = createLetterGuessView(gameState);
             System.out.println(view);
         }
         else if (gameState.equals("LOST"))
-            printYouLoose(gameInfo);
+            printYouLoose(gameState);
 
         else if (gameState.equals("WIN"))
-            printYouWin(gameInfo);
+            printYouWin(gameState);
 
         else
             System.out.println("Nothing got caught in UpdateGameView");
+    }
+
+    private void printYouWin(GameStateDTO gameState) {
+        String view = createLetterGuessView(gameState);
+        System.out.println("\nYOU WON! The word was: '" + gameState.previousWord + "'");
+        System.out.println("\n======= NEW ROUND ======\n");
+        System.out.println(view);
+    }
+
+    private void printYouLoose(GameStateDTO gameState) {
+        String view = createLetterGuessView(gameState);
+        System.out.println("\nYOU LOST... The word was: '" + gameState.previousWord + "'");
+        System.out.println("\n======= NEW ROUND ======\n");
+        System.out.println(view);
+    }
+
+    private String createLetterGuessView(GameStateDTO state) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Score: " + state.gameScore + "  Lives: " + state.livesLeft + "/" + 3 +
+                "   Correct: "+state.numCorrectGuesses + "  Hidden:"+ state.theHiddenWord + "  Guessed: " + state.guessedLetters);
+        return sb.toString();
     }
 
     private String contentLengthControl(String[] gameInfo) {
@@ -42,32 +62,5 @@ public class View {
         if (checkBodyLength == lengthHeader) return "SAME: " + checkBodyLength + " & " + lengthHeader;
         else return "NOT SAME: " + checkBodyLength + " & " + lengthHeader;
 
-    }
-
-    private void printYouWin(String[] gameInfo) {
-        String view = createLetterGuessView(gameInfo);
-        System.out.println("\nYOU WON! The word was: '" + gameInfo[7] + "'");
-        System.out.println("\n======= NEW ROUND ======\n");
-        System.out.println(view);
-    }
-
-    private void printYouLoose(String[] gameInfo) {
-        String view = createLetterGuessView(gameInfo);
-        System.out.println("\nYOU LOST... The word was: '" + gameInfo[7] + "'");
-        System.out.println("\n======= NEW ROUND ======\n");
-        System.out.println(view);
-    }
-
-    private String createLetterGuessView(String[] parts) {
-        String gameScore = parts[2];
-        String livesLeft = parts[3];
-        String numCorrect = parts[4];
-        String guesses = parts[5];
-        String hiddenWord = parts[8];
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("Score: " + gameScore + "  Lives: " + livesLeft + "/" + 3 +
-                "   Correct: "+numCorrect + "  Hidden:"+ hiddenWord + "  Guessed: " + guesses);
-        return sb.toString();
     }
 }
