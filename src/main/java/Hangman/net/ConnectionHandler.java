@@ -11,10 +11,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
 
 public class ConnectionHandler extends Thread {
@@ -26,6 +23,7 @@ public class ConnectionHandler extends Thread {
     PrintWriter dout;
     volatile boolean shouldRun = true;
     JSONParser jsonParser;
+    public String jwt;
 
 
     public ConnectionHandler(Socket socket, Client client) {
@@ -48,19 +46,54 @@ public class ConnectionHandler extends Thread {
         while (shouldRun){
             try{
                 String input = din.readLine();
-                if (input != null){
-                    if (input.equals("quit"))
-                        closeConnection();
-                    GameStateDTO gameState = parseJSONgameState(input);
-                    view.UpdateGameView(gameState);
-                }
+                if (input != null)
+                    stateHandler(input);
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
     }
 
-    private GameStateDTO parseJSONgameState(String input) {
+    private void stateHandler(String input) {
+        Object JSONInput = null;
+        try {
+            JSONInput = jsonParser.parse(input);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        JSONObject message = (JSONObject) JSONInput;
+        String state = message.get("state").toString();
+
+        switch(state) {
+            case "quit":
+                closeConnection();
+                break;
+            case "login":
+                System.out.println(message.get("body").toString());
+                break;
+            case "loginSuccess":
+                jwt = message.get("body").toString();
+                break;
+            case "game":
+                String body = message.get("body").toString();
+                int length = Integer.parseInt(message.get("content-length").toString());
+                System.out.println(controlBodyLength(body, length));
+                GameStateDTO gameState = parseJSONGameState(body);
+                view.UpdateGameView(gameState);
+                break;
+        }
+    }
+
+    private boolean controlBodyLength(String body, int length) {
+        int measuredLength = measureStringByteLength(body);
+        System.out.println("Measured: "+ measuredLength + ", Promised: " + length);
+        if (measuredLength == length)
+            return true;
+        else return false;
+    }
+
+    private GameStateDTO parseJSONGameState(String input) {
         GameStateDTO gameState = new GameStateDTO();
         Object JSONInput = null;
         try {
@@ -95,8 +128,30 @@ public class ConnectionHandler extends Thread {
         System.exit(1);
     }
 
-    public void sendToServer(String text){
-        dout.println(text);
+    public void sendToServer(String jwt, String body){
+        JSONObject message = new JSONObject();
+        message.put("jwt", jwt);
+        message.put("body", body);
+        int contentLength = measureStringByteLength(body);
+        message.put("content-length", contentLength);
+
+        dout.println(message.toJSONString());
         dout.flush();
+    }
+
+    private int measureStringByteLength(String inputBody) {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        ObjectOutputStream objectOutputStream;
+        try {
+            objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
+            objectOutputStream.writeObject(inputBody);
+            objectOutputStream.flush();
+            objectOutputStream.close();
+            int length = byteArrayOutputStream.toByteArray().length;
+            return length;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return -1;
     }
 }

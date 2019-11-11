@@ -35,7 +35,7 @@ public class Client {
         while(true){
             if (console.hasNext()){
                 String userInput = console.nextLine();
-                cc.sendToServer(userInput);
+                cc.sendToServer(cc.jwt , userInput);
             }
 
         }
