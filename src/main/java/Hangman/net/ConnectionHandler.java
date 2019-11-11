@@ -73,6 +73,7 @@ public class ConnectionHandler extends Thread {
                 System.out.println(message.get("body").toString());
                 break;
             case "loginSuccess":
+                System.out.println("Login Success: " + message.get("body").toString());
                 jwt = message.get("body").toString();
                 break;
             case "game":
@@ -128,9 +129,9 @@ public class ConnectionHandler extends Thread {
         System.exit(1);
     }
 
-    public void sendToServer(String jwt, String body){
+    public void sendToServer(String body){
         JSONObject message = new JSONObject();
-        message.put("jwt", jwt);
+        message.put("jwt", this.jwt);
         message.put("body", body);
         int contentLength = measureStringByteLength(body);
         message.put("content-length", contentLength);
